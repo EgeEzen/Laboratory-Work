@@ -37,7 +37,6 @@ metadata <- data.frame(genotype,condition)
 rownames(metadata) <- c("PATZ1_WT1","PATZ1_WT2","PATZ1_WT3",
                                "PATZ1_KO1","PATZ1_KO2","PATZ1_KO3")
 
-
 #Setting the gene ids of the raw data as the row names (maybe it is different in other datas)
 rownames(raw_counts) <- raw_counts$gene_id
 raw_counts$gene_id <- NULL
@@ -61,7 +60,7 @@ all (colnames(raw_counts) == rownames(metadata))
 #write.csv(as.data.frame(raw_counts), file = "patz1_rawcounts.csv")
 
 #creating the DESeq2 object
-#design is the condition, which is WT vs KO (the base will be controlled in later stages)
+#design is the condition, which is WT vs KO (the base will be controlled in later stage)
 dds <- DESeqDataSetFromMatrix(countData = raw_counts,
                                     colData =  metadata,
                                     design = ~ condition)
@@ -73,6 +72,10 @@ dds
 #calculating the median of ratios, and adding to our object 
 #(this is already done in while the deseq2 object, but you can use these values separately)
 dds <- estimateSizeFactors(dds)
+
+#factor level is set here, this means that the base is now untreated (WT) condition
+dds$condition <- relevel(dds$condition, ref = "WT")
+
 
 #extracting the normalized counts from object
 nrm_counts <- counts(dds, normalized = TRUE)
@@ -133,20 +136,19 @@ plotDispEsts(dds)
 #extracting the results
 #If the adjusted p-value cutoff (FDR) will be a value other than 0.1, alpha should be set to that value.
 
-result <- results(dds, 
-                      contrast = c("condition","KO","WT"),
-                      alpha = 0.05)
-#giving contrast as WT vs KO (WT, the third element should be the base)
+result <- results(dds, alpha = 0.05)
 
 #viewing the results
 summary(result)
+result
+
 #you can see the up and down regulation here (LFC > 0 is given, we will further limit that)
 
 #Row names are extracted to gene_id column
 result$gene_id <- rownames(result)
 
 #extracting this results to an excel file
-library(writexl)
+#library(writexl)
 #write_xlsx(as.data.frame(result),"patz1_deseq2_genes.xlsx")
 
 #getting the coefficients for the log shrinkage 
@@ -155,10 +157,11 @@ resultsNames(dds)
 
 #log shrinkage, apeglm method will be used (2018 paper)
 result_shr <- lfcShrink(dds,
-                         coef="condition_WT_vs_KO",type="apeglm")
+                         coef="condition_KO_vs_WT",type="apeglm")
 #from now on I will continue the analysis with this version!
 
-#investigating the results of the shrinkage version
+#investigating the results of the shrinkage version (please check if it is condition treated vs untreated)
+result_shr
 mcols(result_shr)
 summary(result_shr)
 
@@ -174,8 +177,8 @@ resSig <- subset(resOrdered, padj < 0.05)
 resSig <- subset(resSig, ((log2FoldChange > 1) | (log2FoldChange < -1) ))
 
 summary(resSig)
-#88 upregulated
-#52 downregulated
+#57 upregulated
+#84 downregulated
 
 #setting the resSig rownames to a gene_names column
 resSig$gene_names <- rownames(resSig)
@@ -227,8 +230,6 @@ for(i in 1:nrow(resSig_norm)) {
 }
 #setting gene_name as rownames (going back to there, because I will create volcano plot and heatmap)
 rownames(resSig_norm) <- resSig_norm$gene_name.x
-rownames(resSig_norm) <- NULL
-
 
 #we do not need the whole dataset, to use it in a graph, slicing is done
 
@@ -236,7 +237,7 @@ resSig_norm_graph <- resSig_norm[,c(9:14)]
 
 #setting the column names of this new dataframe
 
-colnames(resSig_norm_graph) <- c("KO1","KO2","KO3","WT1","WT2","WT3")
+colnames(resSig_norm_graph) <- c("WT1","WT2","WT3","KO1","KO2","KO3")
 
 pheatmap(resSig_norm_graph, cluster_rows=TRUE, show_rownames=FALSE,scale = "row",
          cluster_cols=TRUE, annotation_col=select(metadata_modified, condition), 
@@ -308,3 +309,23 @@ venn.diagram(
   cat.pos = c(27, 27),
   cat.fontfamily = "sans",
 )
+
+#getting the top20 significant genes (order with padj values)
+top20 <- resSig_norm[order(resSig_norm$padj), ]
+top20 <- top20[1:20,8:14]
+
+#now to convert this dataframe into a key-value pairs with gather function
+top20 <- gather(top20, key = "Sample Name", value= "nrm_counts", 2:7)
+
+#inner joining metadata with the top20 variable (inserting metadata information to top20 df)
+top20 <- inner_join(top20, rownames_to_column(metadata, var = "Sample Name"), by="Sample Name")
+
+#creating the expression plot
+ggplot (top20) +
+  geom_point(aes(x=gene_name.y, y= nrm_counts,color =condition)) +
+  xlab("Genes") +
+  ylab("Normalized Counts") +
+  ggtitle("Top 20 Significant DE Genes for PATZ1")+
+  theme(axis.text.x = element_text(angle = 45, hjust =1))+
+  theme(plot.title = element_text(hjust=0.5))
+
