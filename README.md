@@ -19,3 +19,9 @@ Being mentioned, the count matrices are used as an input for DESEQ2 Diferential 
 ## Python-RnaSeq-Post-Analysis
 
 This directory contains Heatmap and PCA codes if you want to further modify and/or want to use Python for these purposes instead of R.
+
+## Alpha-Fold-Interaction-Scores
+
+### Interaction Scoring Script
+
+This Python script first utilizes 'ProDy' library to take the AlphaFold-Multimer predicted structures (.pdb files) and divides the two chains (all of the predicted structures are dimers) and returns pdb files to the directory. Then with the 'freesasa' library, SASA scores (accessibility of each residue by a molecule that is approximately in water molecule size) for each residue are calculated for each of the pdb file: The main pdb file (dimer structure) and its two chains (monomers). By comparing the SASA scores of each residue of the chains to their main structure, the buried area of the dimers are calculated. The threshold for SASA score difference was chosen after an extensive trial and error. PAE (predicted aligned error) is one of the outputs of the AlphaFold and they are stored in the json file as in dictionary-like structure. Making these scores, an interaction score between the predicted dimers is formed. It should be noted that for PAE, only the residues that are found as interaction sites are chosen (from buried area,SASA) and the PAE scores were computed from interchain residues. 
