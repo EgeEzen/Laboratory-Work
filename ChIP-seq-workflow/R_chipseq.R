@@ -120,15 +120,6 @@ bcl6_genes <- bcl6_genes[!is.na(bcl6_genes)]
 kaiso_genes <- unique(kaiso_annot$ENTREZID)
 kaiso_genes <- kaiso_genes[!is.na(kaiso_genes)]
 
-library("AnnotationDbi")
-library("org.Hs.eg.db")
-#columns(org.Hs.eg.db) # returns list of available keytypes
-patz1_deg$entrez = mapIds(org.Hs.eg.db,
-                     keys=patz1_deg$gene_id, #Column containing Ensembl gene ids
-                     column="ENTREZID",
-                     keytype="ENSEMBL",
-                     multiVals="first")
-
 #enrichment analysis KEGG
 
 genes = lapply(peakAnno, function(i) as.data.frame(i)$ENTREZID)
