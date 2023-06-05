@@ -32,16 +32,21 @@ In short, this script compares the difference between monomers (predicted as a s
 
 ### chipseq_pe.sh
 
-This script takes fastq files (paired-end reads) and through a forced(?)-pipe, the reads will be aligned to a human genome via minimap2 alignment tool (9). Then, through SAMTOOLS the sam files will be sorted and converted to bam files. The important part in here is that duplicates will be marked. (Apparently we are very scared of read duplicates in ChIP-seq analysis).
+Similar to the RNAseq counterpart, this script takes fastq files (paired-end reads) and through a forced(?)-pipe, the reads will be aligned to a human genome via minimap2 alignment tool (9). Then, through SAMTOOLS the sam files will be sorted and converted to bam files. The important part in here is that duplicates will be marked. (Apparently we are very scared of read duplicates in ChIP-seq analysis).
 
 The only difference of the rnaseq_se.sh file is that it allows the inputs of fastq files that have single-end reads.
 
 ### macs_and_idr_example.sh
 
-This script tries to give an example of how to do peak calling and replicate handling via MACS and IDR (10,11).
-****
+This script tries to give an example of how to do peak calling and replicate handling via MACS and IDR (irreproducible discovery rate) (10,11).
 
 ### R_chipseq
+
+The first part of this R script is for ChIPQC, it is used for assessing ChIP-seq sample quality. The library requires a metadata text file that is thoroughly explained in their [vignette](https://bioconductor.org/packages/release/bioc/vignettes/ChIPQC/inst/doc/ChIPQC.pdf). Then you can create a report which includes various quality matrices such as RiP% and RelCC.
+Second part is mostly about annotation of the peaks, in which I utilized [ChIPseeker library](https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html). One can use Ensembl or UCSC reference genome for the annotation, and the peak annotations can be visualized by some plotting types such as pieplot or upsetplot. In the given example, I gathered the promoter region peaks of protein coding genes and tried to correlate with another protein. Finally, KEGG or GO analysis can be performed easily using compareCluster function from [clusterProfiler library](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html). 
+
+****
+
 
 
 
