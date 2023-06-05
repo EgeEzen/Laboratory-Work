@@ -8,7 +8,7 @@ There are several folders in this repository that belong to various attempts at 
 ## RNA-Seq-Workflow
 ### rnaseq.sh
 
-This folder introduces itself with a rnaseq_pe.sh bash script. This script takes fastq files (paired-end reads) and through a pseudo-pipe, the reads will be aligned to a human genome via HISAT2 alignment tool (1). Then, through SAMTOOLS the sam files will be sorted and converted to bam files (2). This machine-readable alignment files then will be assembled through STRINGTIE and utilizing a python script, count matrices (gene and transcript) will be the outputs (3). There will be no intermediate files left such as bam/sam/gtf type of files. From several GBs of data, we are are now left with count matrices that are can be readily given as an input to DESEQ2 Differential Expression analysis tool in R (4).
+This folder introduces itself with a rnaseq_pe.sh bash script. This script takes fastq files (paired-end reads) and through a pseudo-pipe, the reads will be aligned to a human genome via HISAT2 alignment tool (1). Then, through SAMTOOLS the sam files will be sorted and converted to bam files (2). These machine-readable alignment files then will be assembled through STRINGTIE and utilizing a python script, count matrices (gene and transcript) will be the outputs (3). There will be no intermediate files left such as bam/sam/gtf type of files. From several GBs of data, we are are now left with count matrices that are can be readily given as an input to DESEQ2 Differential Expression analysis tool in R (4).
 
 The only difference of the rnaseq_se.sh file is that it allows the inputs of fastq files that have single-end reads.
 
@@ -28,7 +28,22 @@ This Python script first utilizes 'ProDy' library to take the AlphaFold-Multimer
 
 In short, this script compares the difference between monomers (predicted as a single chain) and dimer chains (predicted as two chains in multimer form) of intrachain PAE & plDDT scores. These scores score can either be computed from all residues, reflecting a protein-wide difference, or from interaction residues. *I* think this introduces an unbiased scoring system that can be used to assess the probability of two proteins interacting or even being dimerized. 
 
+## ChIP-seq-workflow
+
+### chipseq_pe.sh
+
+This script takes fastq files (paired-end reads) and through a forced(?)-pipe, the reads will be aligned to a human genome via minimap2 alignment tool (9). Then, through SAMTOOLS the sam files will be sorted and converted to bam files. The important part in here is that duplicates will be marked. (Apparently we are very scared of read duplicates in ChIP-seq analysis).
+
+The only difference of the rnaseq_se.sh file is that it allows the inputs of fastq files that have single-end reads.
+
+### macs_and_idr_example.sh
+
+This script tries to give an example of how to do peak calling and replicate handling via MACS and IDR (10,11).
 ****
+
+### R_chipseq
+
+
 
 #### References
 
@@ -47,3 +62,10 @@ _6- Bakan A, Meireles LM, Bahar I., ProDy: Protein Dynamics Inferred from Theory
 _7- Mitternacht S. FreeSASA: An open source C library for solvent accessible surface area calculations. F1000Res. 2016 Feb 18;5:189. doi: 10.12688/f1000research.7931.1. PMID: 26973785; PMCID: PMC4776673._
 
 _8- Bryant, P., Pozzati, G. & Elofsson, A. Improved prediction of protein-protein interactions using AlphaFold2. Nat Commun 13, 1265 (2022). https://doi.org/10.1038/s41467-022-28865-w_
+
+_9-Heng Li, Minimap2: pairwise alignment for nucleotide sequences, Bioinformatics, Volume 34, Issue 18, September 2018, Pages 3094–3100, https://doi.org/10.1093/bioinformatics/bty191_
+
+_10- Zhang, Y., Liu, T., Meyer, C.A. et al. Model-based Analysis of ChIP-Seq (MACS). Genome Biol 9, R137 (2008). https://doi.org/10.1186/gb-2008-9-9-r137_
+
+_11- "Measuring reproducibility of high-throughput experiments" (2011), Annals of Applied Statistics, Vol. 5, No. 3, 1752-1779, by Li, Brown, Huang, and Bickel_
+
