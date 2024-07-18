@@ -1,9 +1,8 @@
 # Molecular Biology Codes 
 
 ...from a volcano plot enthusiast.
-Welcome to my repository, I hope my codes won't make you inaudibly say 'what ?'. :)
-
-There are several folders in this repository that belong to various attempts at molecular biology analysis.
+Welcome to my repository :).
+There are several folders in this repository that belong to various approaches at omics analysis.
 
 ## RNA-Seq-Workflow
 ### rnaseq.sh
@@ -38,7 +37,7 @@ The only difference of the rnaseq_se.sh file is that it allows the inputs of fas
 
 ### macs_and_idr_example.sh
 
-This script tries to give an example of how to do peak calling and replicate handling via MACS and IDR (irreproducible discovery rate) (10,11).
+This script gives an example of how to do peak calling and replicate handling via MACS and IDR (irreproducible discovery rate) (10,11).
 
 ### R_chipseq
 
